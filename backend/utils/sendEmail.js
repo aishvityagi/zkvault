@@ -27,7 +27,10 @@ const sendEmail = async ({ to, subject, text }) => {
   const transporter = createTransporter();
   const from = process.env.SMTP_FROM || `"ZK Vault" <noreply@zkvault.app>`;
 
+  
+console.log(`[email] Sending to ${to} via ${transporter.options?.host}`);
   await transporter.sendMail({ from, to, subject, text });
+  console.log(`[email] Sent successfully to ${to}`);
 };
 
 module.exports = sendEmail;
