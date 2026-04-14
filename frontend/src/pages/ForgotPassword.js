@@ -26,6 +26,7 @@ export default function ForgotPassword() {
     try {
       await api.post("/api/auth/request-reset", { email });
       setStep(STEP.VERIFY);
+      setError("📩 Verification code sent (Test Mode). Check Mailtrap inbox.");
     } catch (err) { setError(err.response?.data?.message || "Something went wrong."); }
     finally { setLoading(false); }
   };
@@ -93,7 +94,19 @@ export default function ForgotPassword() {
                 onFocus={e => e.target.style.borderColor = "#7c3aed"}
                 onBlur={e => e.target.style.borderColor = "#1e1e2e"} />
             </div>
-            {error && <div style={errorBox}>⚠ {error}</div>}
+
+<div style={{
+  background: "#facc1515",
+  border: "1px solid #facc1530",
+  borderRadius: 8,
+  padding: "10px 14px",
+  color: "#facc15",
+  fontSize: 12
+}}>
+  📩 Email functionality is in test mode. Check Mailtrap inbox.
+</div>
+
+{error && <div style={errorBox}>⚠ {error}</div>}
             <button type="submit" disabled={loading} style={btn}>
               {loading ? "Sending..." : "Send Verification Code →"}
             </button>
