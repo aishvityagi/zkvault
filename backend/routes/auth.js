@@ -158,6 +158,8 @@ router.post("/request-reset", strictLimiter, async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase() });
 
+    console.log("User found:", user);
+console.log("Recovery enabled:", user?.recoveryEnabled);
     if (!user || !user.recoveryEnabled) {
       return res.json({ message: "If this email is registered, a code has been sent." });
     }
