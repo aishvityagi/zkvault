@@ -152,6 +152,7 @@ router.get("/me", protect, async (req, res) => {
 // ── REQUEST RESET ─────────────────────────────────────────────────────────────
 router.post("/request-reset", strictLimiter, async (req, res) => {
   try {
+    console.log("🔥 REQUEST-RESET HIT");
     const { email } = req.body;
     if (!email?.trim()) return res.status(400).json({ message: "Email required." });
 
