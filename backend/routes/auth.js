@@ -164,6 +164,8 @@ router.post("/request-reset", strictLimiter, async (req, res) => {
     const otp     = Math.floor(100000 + Math.random() * 900000).toString();
     const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
 
+    console.log("OTP GENERATED:", otp);
+    console.log("Sending email to:", user.email);
     user.resetTokenHash   = otpHash;
     user.resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
