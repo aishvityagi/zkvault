@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:         process.env.REACT_APP_API_URL || "http://localhost:5000",
-  withCredentials: true, // send httpOnly cookies on every request
+  baseURL: "https://zkvault-backend.onrender.com",
+  withCredentials: true,
 });
 
 export default api;
