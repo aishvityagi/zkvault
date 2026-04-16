@@ -1,95 +1,165 @@
-# 🔒 ZK Vault — Zero-Knowledge Personal Data Vault
+# 🔐 ZK Vault — Zero-Knowledge Personal Data Vault
 
-A production-ready, end-to-end encrypted personal data vault. Your master password never leaves your device. The server stores only ciphertext it cannot read.
+A production-ready, end-to-end encrypted personal vault for storing sensitive data securely.
+Your master password never leaves your device — the server stores only encrypted data it cannot read.
+
+🌐 **Live Demo**:
+Frontend: https://zkvault-frontend.onrender.com
+Backend: https://zkvault-backend.onrender.com
 
 ---
 
-## How the Encryption Works
+## 🧠 Architecture Overview
+
+ZK Vault follows a **zero-knowledge security model**, ensuring that even the server cannot access user data.
+
+### 🔑 Encryption Flow
 
 ```
-Password → PBKDF2 (600k iterations, SHA-256) → KEK
-Random 256-bit MEK generated at signup
-MEK encrypted with KEK → stored on server (server cannot decrypt)
-Vault data → AES-256-GCM encrypted with MEK → stored on server
-MEK lives in a useRef in the browser — never localStorage, never the server
-Recovery code → second encrypted copy of MEK → allows vault recovery without password
+Password → PBKDF2 (600k iterations, SHA-256) → KEK  
+Random 256-bit MEK generated at signup  
+MEK encrypted with KEK → stored on server  
+Vault data → AES-256-GCM encrypted with MEK → stored on server  
+MEK stored only in memory (useRef) — never localStorage or server  
+Recovery code → encrypted backup of MEK for account recovery  
 ```
 
 ---
 
-## Security Features
+## 🔒 Security Features
 
-- **Zero-knowledge**: Server stores only ciphertext. Keys are derived client-side.
-- **AES-256-GCM** encryption for all vault data
-- **PBKDF2** with 600,000 iterations for key derivation
-- **httpOnly cookies** for JWT — immune to XSS token theft
-- **Rate limiting** on all auth endpoints (express-rate-limit)
-- **Helmet** security headers on all responses
-- **MongoDB injection sanitization** (express-mongo-sanitize)
-- **CORS** locked to configured frontend origin
-- **TOTP-based 2FA** (Google Authenticator compatible)
-- **Auto-lock** after 5 minutes of inactivity — clears MEK from memory
-- **Recovery code** for vault access if master password is forgotten
-- **Input validation** on all backend endpoints
-
----
-
-## Tech Stack
-
-- **Backend**: Node.js, Express, MongoDB/Mongoose, JWT, bcrypt, Nodemailer, otplib
-- **Frontend**: React, Axios, React Router, Web Crypto API
-- **Deployment**: Vercel (frontend + backend), MongoDB Atlas
+* **Zero-Knowledge Architecture** — server never sees plaintext data
+* **AES-256-GCM Encryption** for all vault entries
+* **PBKDF2 (600,000 iterations)** for strong key derivation
+* **httpOnly JWT Cookies** — prevents XSS token theft
+* **Rate Limiting** on authentication endpoints
+* **Helmet.js Security Headers**
+* **MongoDB Injection Protection**
+* **Strict CORS Policy**
+* **TOTP-based 2FA** (Google Authenticator compatible)
+* **Auto-Lock (5 minutes)** — clears encryption key from memory
+* **Recovery Code System** for password reset without data loss
+* **Full Input Validation** on backend
 
 ---
 
-## Local Development Setup
+## ⚙️ Tech Stack
 
-### 1. Clone the repo
+### Backend
 
-```bash
+* Node.js
+* Express.js
+* MongoDB + Mongoose
+* JWT Authentication
+* bcrypt (password hashing)
+* Nodemailer (Mailtrap for development)
+* otplib (2FA)
+
+### Frontend
+
+* React.js
+* Axios
+* React Router
+* Web Crypto API
+
+### Deployment
+
+* Render (Frontend + Backend)
+* MongoDB Atlas
+
+---
+
+## 📦 Features
+
+* 🔐 Secure vault for storing sensitive data
+* 🔑 Password generator with custom options
+* 📊 Password strength meter
+* 🔍 Search and filter functionality
+* 🔒 Auto-lock after inactivity
+* 📱 Responsive UI
+* 🔐 Two-Factor Authentication (2FA)
+* 🔁 Password reset via OTP + recovery code
+* 🧾 Multiple item types supported
+
+---
+
+## 📁 Supported Data Types
+
+| Type           | Fields                                    |
+| -------------- | ----------------------------------------- |
+| 🔑 Password    | URL, Username, Password, Notes            |
+| 💳 Card        | Cardholder Name, Card Number, Expiry, CVV |
+| 📝 Secure Note | Text                                      |
+| 🪪 Identity    | Name, Document Type, Number, Expiry       |
+| 🔐 API Key     | Service Name, Key Value, Notes            |
+| 📶 WiFi        | Network Name, Password, Security Type     |
+
+---
+
+## ⚠️ Email Functionality (Important)
+
+📩 Email functionality is currently in **test mode using Mailtrap**.
+
+* OTP emails are not delivered to real inboxes
+* Emails can only be viewed in the developer’s Mailtrap sandbox
+
+👉 For production use, integrate a real email service (e.g., SendGrid, Gmail SMTP)
+
+---
+
+## 🛠️ Local Development Setup
+
+### 1. Clone Repository
+
+```
 git clone https://github.com/yourusername/zkvault.git
 cd zkvault
 ```
 
-### 2. Backend setup
+---
 
-```bash
+### 2. Backend Setup
+
+```
 cd backend
 npm install
 cp .env.example .env
-# Fill in .env values (see below)
 npm run dev
 ```
 
-### 3. Frontend setup
+---
 
-```bash
+### 3. Frontend Setup
+
+```
 cd frontend
 npm install
 cp .env.example .env
-# Set REACT_APP_API_URL=http://localhost:5000
 npm start
 ```
 
 ---
 
-## Environment Variables
+## 🔐 Environment Variables
 
 ### Backend `.env`
 
 ```
-MONGO_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/zkvault
-JWT_SECRET=<64-byte random hex>
+MONGO_URI=
+JWT_SECRET=
 NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
-MAILTRAP_USER=<your mailtrap user>
-MAILTRAP_PASS=<your mailtrap pass>
+MAILTRAP_USER=
+MAILTRAP_PASS=
 ```
 
-Generate JWT_SECRET:
-```bash
+Generate JWT Secret:
+
+```
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
+
+---
 
 ### Frontend `.env`
 
@@ -99,59 +169,25 @@ REACT_APP_API_URL=http://localhost:5000
 
 ---
 
-## Deploying to Vercel
+## 🚀 Deployment Notes
 
-### Backend
-
-1. Push `backend/` to a GitHub repo (or monorepo)
-2. Import project in Vercel → set root to `backend/`
-3. Add all environment variables from `.env.example`
-4. Set `NODE_ENV=production`
-5. Set `FRONTEND_URL=https://your-frontend.vercel.app`
-
-### Frontend
-
-1. Import `frontend/` in Vercel
-2. Add environment variable:
-   - `REACT_APP_API_URL=https://your-backend.vercel.app`
-3. Deploy
-
-### MongoDB Atlas
-
-1. Create a free cluster at [mongodb.com/atlas](https://mongodb.com/atlas)
-2. Create a database user
-3. Whitelist `0.0.0.0/0` (allow all IPs — required for Vercel serverless)
-4. Copy the connection string to `MONGO_URI`
+* Ensure correct CORS origin is set
+* Use HTTPS in production
+* Store secrets securely (never commit `.env`)
+* Replace Mailtrap with a production email provider
 
 ---
 
-## Item Types Supported
+## 📌 Future Improvements
 
-| Type | Fields |
-|------|--------|
-| 🔑 Password | URL, Username, Password, Notes |
-| 💳 Card | Cardholder Name, Card Number, Expiry, CVV |
-| 📝 Secure Note | Text |
-| 🪪 Identity | Full Name, Document Type, Number, Expiry, Country |
-| 🔐 API Key | Service Name, Key Value, Expiry, Notes |
-| 📶 WiFi | Network Name, Password, Security Type |
+* Production email integration
+* Biometric authentication
+* Browser extension support
+* Secure vault sharing
+* Backup & sync across devices
 
 ---
 
-## Features
+## 📜 License
 
-- Encrypted vault with all item types above
-- Password generator with configurable options (length, charset)
-- Password strength meter on all password fields
-- Search and filter across vault items
-- Auto-lock after 5 minutes of inactivity
-- TOTP-based two-factor authentication
-- Vault recovery via recovery code
-- Password reset via email OTP + recovery code
-- Mobile-responsive UI
-
----
-
-## License
-
-MIT
+MIT License
